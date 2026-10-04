@@ -21,7 +21,7 @@ class Airport:
     code: str
     name: str
     city: str
-    meteostat_station: str
+    iem_station: str
     timezone: str
 
 
@@ -75,8 +75,7 @@ def load_config(path: Path = CONFIG_PATH) -> ProjectConfig:
             code=code,
             name=attrs["name"],
             city=attrs["city"],
-            # str() guards against a station id written without quotes in YAML
-            meteostat_station=str(attrs["meteostat_station"]),
+            iem_station=str(attrs["iem_station"]),
             timezone=attrs["timezone"],
         )
 
@@ -119,6 +118,6 @@ if __name__ == "__main__":
     # Quick check: python -m ingest.config
     config = load_config()
     for airport in config.airports.values():
-        print(f"{airport.code}: station {airport.meteostat_station}, {airport.name}")
+        print(f"{airport.code}: IEM station {airport.iem_station}, {airport.name}")
     for event in config.events.values():
         print(f"{event.event_id}: {event.name}, months {event.months()}")

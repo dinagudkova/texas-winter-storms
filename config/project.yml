@@ -5,24 +5,22 @@ airports:
   DFW:
     name: Dallas/Fort Worth International Airport
     city: Dallas-Fort Worth
-    meteostat_station: "72259"
+    iem_station: DFW
     timezone: America/Chicago
   IAH:
     name: George Bush Intercontinental Airport
     city: Houston
-    meteostat_station: "72243"
+    iem_station: IAH
     timezone: America/Chicago
   AUS:
     name: Austin-Bergstrom International Airport
     city: Austin
-    # 74745 is the station at the airport (ICAO KAUS).
-    # Not 72254: in Meteostat that is Camp Mabry (KATT), a city station ~16 km away.
-    meteostat_station: "74745"
+    iem_station: AUS
     timezone: America/Chicago
   SAT:
     name: San Antonio International Airport
     city: San Antonio
-    meteostat_station: "72253"
+    iem_station: SAT
     timezone: America/Chicago
 
 # data_start / data_end: the whole window to download, including a normal baseline.
