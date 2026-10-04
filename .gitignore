@@ -15,8 +15,9 @@ __pycache__/
 .ipynb_checkpoints/
 
 # dbt
+dbt/.user.yml
 dbt/target/
-dbt/logs/
+logs/
 dbt/dbt_packages/
 
 # OS / editors
@@ -24,3 +25,6 @@ dbt/dbt_packages/
 Thumbs.db
 .vscode/
 .idea/
+
+# Scratch files
+scratch.*
