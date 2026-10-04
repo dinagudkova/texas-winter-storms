@@ -1,2 +1,9 @@
-# texas-winter-storms
-How winter storms Uri (2021) and Fern (2026) disrupted flights at Texas airports. BTS and Meteostat, dbt, DuckDB
+# Texas Winter Storms vs. Flights
+
+How did winter storms disrupt flights at Texas's four largest airports (DFW, IAH, AUS, SAT),
+and did airports and airlines handle Winter Storm Fern (January 2026) better than
+Winter Storm Uri (February 2021)?
+
+**Stack:** Python, DuckDB, dbt, pandas. **Data:** BTS On-Time Performance, Meteostat.
+
+> 🚧 Work in progress.

@@ -1,0 +1,13 @@
+# Ingestion
+requests>=2.31
+pyyaml>=6.0
+meteostat>=2.0
+
+# Storage and transformation
+duckdb>=1.1
+dbt-duckdb>=1.11
+
+# Analysis
+pandas>=2.0
+matplotlib>=3.8
+ipykernel>=6.0
