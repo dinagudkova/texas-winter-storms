@@ -1,0 +1,26 @@
+# Data: everything can be re-downloaded by the ingestion scripts
+data/
+*.duckdb
+*.duckdb.wal
+
+# Secrets
+.env
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Jupyter
+.ipynb_checkpoints/
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
