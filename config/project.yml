@@ -1,0 +1,46 @@
+# Single source of truth for the pipeline.
+# Ingestion scripts read this file to decide what to download.
+
+airports:
+  DFW:
+    name: Dallas/Fort Worth International Airport
+    city: Dallas-Fort Worth
+    meteostat_station: "72259"
+    timezone: America/Chicago
+  IAH:
+    name: George Bush Intercontinental Airport
+    city: Houston
+    meteostat_station: "72243"
+    timezone: America/Chicago
+  AUS:
+    name: Austin-Bergstrom International Airport
+    city: Austin
+    # 74745 is the station at the airport (ICAO KAUS).
+    # Not 72254: in Meteostat that is Camp Mabry (KATT), a city station ~16 km away.
+    meteostat_station: "74745"
+    timezone: America/Chicago
+  SAT:
+    name: San Antonio International Airport
+    city: San Antonio
+    meteostat_station: "72253"
+    timezone: America/Chicago
+
+# data_start / data_end: the whole window to download, including a normal baseline.
+# storm_start / storm_end: the storm period used for before / storm / after splits.
+events:
+  uri_2021:
+    name: Winter Storm Uri
+    data_start: 2021-01-01
+    data_end: 2021-02-28
+    storm_start: 2021-02-14
+    storm_end: 2021-02-19
+    airports: [DFW, IAH, AUS, SAT]
+
+  fern_2026:
+    name: Winter Storm Fern
+    data_start: 2026-01-01
+    data_end: 2026-02-28
+    # Preliminary window from news coverage. Refine it from the weather data.
+    storm_start: 2026-01-23
+    storm_end: 2026-01-28
+    airports: [DFW, IAH, AUS, SAT]
