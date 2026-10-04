@@ -26,3 +26,39 @@ models:
           - accepted_values:
               arguments:
                 values: ['A', 'B', 'C', 'D']
+
+  - name: stg_metar
+    description: >
+      One row per METAR report (routine hourly or special) at DFW, IAH, AUS and SAT
+      from the IEM archive. Values converted to metric units, times to local time.
+    columns:
+      - name: metar_id
+        description: Hash of airport_code, valid_utc and report_type.
+        data_tests:
+          - unique
+          - not_null
+      - name: airport_code
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['DFW', 'IAH', 'AUS', 'SAT']
+      - name: report_type
+        description: routine = scheduled hourly report (around :53), special = issued when the weather changes.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['routine', 'special']
+      - name: valid_utc
+        data_tests:
+          - not_null
+      - name: valid_local
+        description: Report time in US Central time, comparable with BTS flight times.
+      - name: precip_mm
+        description: >
+          Precipitation since the last routine report, mm. In special reports this is a running
+          total within the hour, so hourly totals must use routine reports only. Trace = 0.
+      - name: ice_accretion_1h_mm
+        description: Ice accretion over the last hour, mm. Trace = 0. Reported only during freezing rain.
+      - name: weather_codes
+        description: Present weather codes as reported, e.g. '-FZRA BR'. NULL when no phenomenon was reported.
