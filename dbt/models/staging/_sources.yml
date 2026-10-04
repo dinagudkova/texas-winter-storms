@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw Parquet files written by the ingestion scripts in ingest/.
+    config:
+      external_location: "../data/raw/{name}/*.parquet"
+    tables:
+      - name: flights
+        description: BTS On-Time Performance, one file per month, original column names.
+      - name: metar
+        description: IEM METAR reports, one file per airport and month, values as text, times in UTC.

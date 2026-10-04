@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_flights
+    description: >
+      One row per scheduled flight departing from or arriving at DFW, IAH, AUS or SAT.
+      Columns renamed to snake_case, flags as booleans, cancellation codes decoded.
+    columns:
+      - name: flight_id
+        description: Hash of flight_date, airline_code, flight_number and origin_airport.
+        data_tests:
+          - unique
+          - not_null
+      - name: flight_date
+        data_tests:
+          - not_null
+      - name: origin_airport
+        data_tests:
+          - not_null
+      - name: is_cancelled
+        data_tests:
+          - not_null
+      - name: cancellation_code
+        description: A carrier, B weather, C national air system, D security. Filled only for cancelled flights.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['A', 'B', 'C', 'D']
