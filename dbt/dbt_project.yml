@@ -45,3 +45,5 @@ models:
 vars:
   # All four airports (DFW, IAH, AUS, SAT) are in US Central time.
   local_timezone: America/Chicago
+  # Airports covered by the project; flights to or from other airports are only kept as counterparts.
+  airports: ['DFW', 'IAH', 'AUS', 'SAT']

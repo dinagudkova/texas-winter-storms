@@ -34,3 +34,26 @@ models:
           - accepted_values:
               arguments:
                 values: ['freezing_rain', 'ice_pellets', 'snow', 'rain', 'fog', 'none']
+
+  - name: prep_flights
+    description: >
+      One row per scheduled flight with local timestamps. scheduled_dep_hour is the key
+      for joining weather at the origin airport; scheduled_arr_ts is filled only for
+      arrivals at the project airports.
+    columns:
+      - name: flight_id
+        data_tests:
+          - unique
+          - not_null
+      - name: scheduled_dep_ts
+        description: Scheduled departure, origin local time. '2400' is midnight at the end of flight_date.
+        data_tests:
+          - not_null
+      - name: actual_dep_ts
+        description: Scheduled departure plus departure delay. NULL for cancelled flights.
+      - name: scheduled_arr_ts
+        description: Scheduled arrival in US Central time, only for arrivals at DFW, IAH, AUS or SAT.
+      - name: is_departure
+        description: Origin is one of the project airports.
+      - name: is_arrival
+        description: Destination is one of the project airports.
