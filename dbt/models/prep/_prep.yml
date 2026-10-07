@@ -1,0 +1,36 @@
+version: 2
+
+models:
+  - name: prep_weather_hourly
+    description: >
+      One row per airport and local hour (US Central time) for every month with data.
+      Weather phenomena are parsed from METAR codes; a phenomenon counts for the hour
+      if any report of the hour mentions it. Codes in the vicinity (VC), blowing (BL)
+      and drifting (DR) are ignored. Hours without reports are kept with has_report = false.
+    columns:
+      - name: weather_hour_id
+        description: Hash of airport_code and weather_hour.
+        data_tests:
+          - unique
+          - not_null
+      - name: airport_code
+        data_tests:
+          - not_null
+      - name: weather_hour
+        description: >
+          Start of the local hour. Reports are shifted by 7 minutes before truncating,
+          so the routine report at 10:53 belongs to the hour 11:00.
+        data_tests:
+          - not_null
+      - name: precip_mm
+        description: Precipitation over the hour from the routine report only, mm.
+      - name: has_winter_precip
+        description: Freezing rain or drizzle, ice pellets or snow during the hour.
+      - name: weather_group
+        description: >
+          Most disruptive phenomenon of the hour, in this order: freezing_rain, ice_pellets,
+          snow, rain, fog, none. NULL when the hour has no reports.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['freezing_rain', 'ice_pellets', 'snow', 'rain', 'fog', 'none']
