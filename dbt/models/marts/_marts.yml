@@ -52,3 +52,52 @@ models:
         description: cancelled / scheduled_departures. NULL when nothing was scheduled.
       - name: delay_15_rate
         description: Share of operated departures delayed 15+ minutes. NULL when nothing operated.
+
+  - name: mart_storm_summary
+    description: >
+      One row per storm event and airport. Storm boundaries are derived from the weather with
+      the same rules for every storm (see the header of the SQL file): onset and end of the
+      first winter precipitation episode near the seed dates, lag from onset to mass
+      cancellations, and recovery time after the precipitation ended.
+    columns:
+      - name: storm_airport_id
+        data_tests:
+          - unique
+          - not_null
+      - name: event_id
+        data_tests:
+          - not_null
+      - name: storm_onset
+        description: >
+          First hour of the main winter episode (the one with the most winter hours)
+          in the search window, local time.
+        data_tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: n_winter_episodes
+        description: >
+          Winter precipitation episodes in the search window, separated by 24+ dry hours.
+          More than 1 means a second episode exists that the onset/end columns do not cover.
+      - name: lag_to_mass_cancel_h
+        description: >
+          Hours from storm onset to the first hour (searched from 24 hours before onset) with
+          3+ scheduled departures and 50 %+ cancelled. Negative when cancellations started
+          before the precipitation.
+      - name: sustained_onset
+        description: >
+          First hour of the main episode that starts 6+ consecutive hours of winter precipitation.
+          Equals storm_onset when the storm started at full strength; later when it began with
+          light, intermittent icing.
+      - name: lag_from_sustained_h
+        description: Hours from sustained_onset to the first mass cancellation hour.
+      - name: recovery_h
+        description: >
+          Hours from the precipitation end to the first of 6 consecutive busy hours
+          (3+ scheduled departures) with less than 10 % cancelled.
+      - name: pre_onset_cancel_rate
+        description: Cancellation rate in the 24 hours before storm onset.
+      - name: disruption_cancel_rate
+        description: Cancellation rate from storm onset until recovery.
+      - name: weather_reason_share
+        description: Share of cancellations in the disruption window coded by the airline as weather (B).
