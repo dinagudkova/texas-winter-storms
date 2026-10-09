@@ -57,8 +57,9 @@ models:
     description: >
       One row per storm event and airport. Storm boundaries are derived from the weather with
       the same rules for every storm (see the header of the SQL file): onset and end of the
-      first winter precipitation episode near the seed dates, lag from onset to mass
-      cancellations, and recovery time after the precipitation ended.
+      main winter precipitation episode near the seed dates (the episode with the most winter
+      hours), the start of sustained precipitation (6+ consecutive hours), lags from both to
+      mass cancellations, and recovery time after the precipitation ended.
     columns:
       - name: storm_airport_id
         data_tests:
