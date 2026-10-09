@@ -75,7 +75,10 @@ cancellation_reason,
 is_diverted,
 dep_delay_min,
 arr_delay_min,
-dep_delay_min >= 15 as is_dep_delayed_15,
+-- delayed = operated and left 15+ minutes late; some cancelled flights also carry a
+-- departure delay (they left the gate, e.g. for de-icing, and were cancelled afterwards)
+not is_cancelled
+and dep_delay_min >= 15 as is_dep_delayed_15,
 taxi_out_min,
 
 -- delay causes, minutes

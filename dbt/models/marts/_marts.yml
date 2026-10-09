@@ -32,3 +32,23 @@ models:
           - not_null
       - name: has_weather_report
         description: False when no METAR was issued in that hour; weather columns are then NULL.
+
+  - name: mart_airport_hourly
+    description: >
+      One row per airport and local hour with scheduled departures, cancellations by reason,
+      delays and the weather of that hour. Basis for storm timing metrics: when cancellations
+      started relative to winter precipitation and how fast operations recovered.
+    columns:
+      - name: airport_hour_id
+        data_tests:
+          - unique
+          - not_null
+      - name: event_id
+        data_tests:
+          - not_null
+      - name: scheduled_departures
+        description: Departures scheduled in this hour, including cancelled ones.
+      - name: cancellation_rate
+        description: cancelled / scheduled_departures. NULL when nothing was scheduled.
+      - name: delay_15_rate
+        description: Share of operated departures delayed 15+ minutes. NULL when nothing operated.

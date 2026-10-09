@@ -57,3 +57,7 @@ models:
         description: Origin is one of the project airports.
       - name: is_arrival
         description: Destination is one of the project airports.
+      - name: is_dep_delayed_15
+        description: >
+          Operated flight that departed 15+ minutes late. Cancelled flights are never counted
+          as delayed, even when BTS reports a departure delay for them.
