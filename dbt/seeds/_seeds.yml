@@ -1,0 +1,19 @@
+version: 2
+
+seeds:
+  - name: storm_events
+    description: >
+      Storm events and their time windows. Keep in sync with config/project.yml.
+      data_start/data_end: the whole downloaded period; storm_start/storm_end: the storm
+      itself, both dates inclusive (local time).
+    config:
+      column_types:
+        data_start: date
+        data_end: date
+        storm_start: date
+        storm_end: date
+    columns:
+      - name: event_id
+        data_tests:
+          - unique
+          - not_null

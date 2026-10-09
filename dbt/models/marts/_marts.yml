@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: mart_flights_weather
+    description: >
+      One row per flight departing from DFW, IAH, AUS or SAT, with the weather at the
+      origin airport in the hour of the scheduled departure and the storm period
+      (before / storm / after) of the event whose data window contains the flight.
+    columns:
+      - name: flight_id
+        data_tests:
+          - unique
+          - not_null
+      - name: event_id
+        description: Storm event whose data window contains the flight date.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('storm_events')
+                field: event_id
+      - name: storm_period
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['before', 'storm', 'after']
+      - name: weather_hour_id
+        description: >
+          Matching hour in prep_weather_hourly. NULL would mean the hour grid does not
+          cover the departure time.
+        data_tests:
+          - not_null
+      - name: has_weather_report
+        description: False when no METAR was issued in that hour; weather columns are then NULL.

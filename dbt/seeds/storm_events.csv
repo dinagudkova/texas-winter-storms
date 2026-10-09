@@ -1,0 +1,3 @@
+event_id,event_name,data_start,data_end,storm_start,storm_end
+uri_2021,Winter Storm Uri,2021-01-01,2021-02-28,2021-02-14,2021-02-19
+fern_2026,Winter Storm Fern,2026-01-01,2026-02-28,2026-01-23,2026-01-28
