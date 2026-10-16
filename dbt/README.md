@@ -1,15 +1,21 @@
-Welcome to your new dbt project!
+# dbt project
 
-### Using the starter project
+Transforms the raw Parquet files from `ingest/` into analysis-ready tables in DuckDB
+(`data/warehouse.duckdb`).
 
-Try running the following commands:
-- dbt run
-- dbt test
+## Run
 
+Always run dbt from this folder, so that relative paths to the data resolve:
 
-### Resources:
-- Learn more about dbt [in the docs](https://docs.getdbt.com/docs/introduction)
-- Check out [Discourse](https://discourse.getdbt.com/) for commonly asked questions and answers
-- Join the [chat](https://community.getdbt.com/) on Slack for live discussions and support
-- Find [dbt events](https://events.getdbt.com) near you
-- Check out [the blog](https://blog.getdbt.com/) for the latest news on dbt's development and best practices
+    cd dbt
+    dbt seed     # load storm_events.csv
+    dbt build    # build all models and run all tests
+    dbt docs generate && dbt docs serve   # documentation and lineage graph
+
+## Layers
+
+- `models/staging/` — one model per source: renaming, types, units, UTC to local time (views)
+- `models/prep/` — local flight timestamps and hourly weather parsed from METAR codes (tables)
+- `models/marts/` — flights with weather, airport hours and the storm summary (tables)
+- `seeds/storm_events.csv` — approximate storm dates; keep in sync with `config/project.yml`
+- `tests/` — singular tests that check counts across models
