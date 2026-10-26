@@ -102,3 +102,36 @@ models:
         description: Cancellation rate from storm onset until recovery.
       - name: weather_reason_share
         description: Share of cancellations in the disruption window coded by the airline as weather (B).
+  
+  - name: mart_storm_timeline
+    description: >
+      One row per storm, airport and hour around the storm onset (start of sustained winter
+      precipitation, or the first winter hour when there was none). Hourly departures,
+      cancellations and weather on a common "hours from onset" axis, for BI tools and the
+      analysis notebook. Window size is set by the timeline_hours_before / _after vars.
+    columns:
+      - name: airport_hour_id
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('mart_airport_hourly')
+                field: airport_hour_id
+      - name: hours_from_onset
+        description: Hours from the onset; negative before it.
+        data_tests:
+          - not_null
+      - name: hours_from_onset_3h
+        description: hours_from_onset rounded down to a 3-hour bin.
+      - name: storm_phase
+        description: >
+          before (ahead of the onset), precipitation (onset to end of winter precipitation),
+          recovery (until cancellations stayed below 10 % for six busy hours), normal.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['before', 'precipitation', 'recovery', 'normal']
+      - name: is_busy_hour
+        description: 3+ scheduled departures; rates of quieter hours are noisy.
