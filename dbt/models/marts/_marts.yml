@@ -135,3 +135,61 @@ models:
                 values: ['before', 'precipitation', 'recovery', 'normal']
       - name: is_busy_hour
         description: 3+ scheduled departures; rates of quieter hours are noisy.
+  - name: mart_airline_storm
+    description: >
+      One row per storm, airport and airline group (airline_groups seed, other carriers as
+      'Other'): cancellations in the 24 hours before the onset of sustained winter
+      precipitation and from that onset to the end of precipitation, and the extra departure
+      delay of flights that operated in winter hours. Rules in the header of the SQL file.
+    columns:
+      - name: airline_storm_id
+        data_tests:
+          - unique
+          - not_null
+      - name: event_id
+        data_tests:
+          - not_null
+      - name: airline_group
+        data_tests:
+          - not_null
+      - name: cancel_rate_before
+        description: Cancelled / scheduled in the 24 hours before the onset. NULL with fewer than 30 departures.
+      - name: cancel_rate_during
+        description: Cancelled / scheduled from the onset to the end of precipitation. NULL with fewer than 30 departures.
+      - name: is_comparable_group
+        description: >
+          The group had 30+ departures during the precipitation in at least one storm at this
+          airport. Groups without it are too small to show for either storm.
+      - name: extra_delay_min
+        description: >
+          Median departure delay of operated flights in winter hours minus the median in hours
+          without weather phenomena, whole data window. NULL with fewer than 20 operated
+          departures in winter hours.
+
+  - name: mart_airport_daily
+    description: >
+      One row per storm event, airport and local day of the data window, with the main storm
+      period, a flag for unusual days outside it (20+ departures, 5 %+ cancelled), their likely
+      explanation from the weather at the airport, and diverted arrivals.
+    columns:
+      - name: airport_day_id
+        data_tests:
+          - unique
+          - not_null
+      - name: event_id
+        data_tests:
+          - not_null
+      - name: aligned_day
+        description: The same calendar day in 2021, so both data windows share one date axis.
+      - name: is_storm_period
+        description: From the day before the storm onset to the end of recovery (or 3 days after precip_end).
+        data_tests:
+          - not_null
+      - name: unusual_reason
+        description: Only for unusual days.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['local snow or ice', 'thunderstorms', 'weather elsewhere']
+      - name: normal_diverted_arrivals
+        description: Median diverted arrivals per day at the airport in the same year.

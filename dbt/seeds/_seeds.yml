@@ -17,3 +17,17 @@ seeds:
         data_tests:
           - unique
           - not_null
+  - name: airline_groups
+    description: >
+      Operating carrier → marketing brand. BTS reports the operating carrier, so regional
+      flights appear under their own codes; carriers flying for one brand are grouped with it.
+      Carriers not listed here (multi-brand regionals such as SkyWest, Republic and Mesa,
+      and smaller airlines) are grouped as 'Other' in the marts.
+    columns:
+      - name: airline_code
+        data_tests:
+          - unique
+          - not_null
+      - name: airline_group
+        data_tests:
+          - not_null
