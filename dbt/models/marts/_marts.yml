@@ -137,34 +137,19 @@ models:
         description: 3+ scheduled departures; rates of quieter hours are noisy.
   - name: mart_airline_storm
     description: >
-      One row per storm, airport and airline group (airline_groups seed, other carriers as
-      'Other'): cancellations in the 24 hours before the onset of sustained winter
-      precipitation and from that onset to the end of precipitation, and the extra departure
-      delay of flights that operated in winter hours. Rules in the header of the SQL file.
+      One row per storm, airport and airline group: cancellations in the 24 hours before the
+      onset and during the precipitation, and the median extra delay and taxi-out of flights
+      operated in winter hours. Rates need 30+ departures, extras 20+ operated flights.
     columns:
       - name: airline_storm_id
-        data_tests:
-          - unique
-          - not_null
-      - name: event_id
-        data_tests:
-          - not_null
+        data_tests: [unique, not_null]
       - name: airline_group
         data_tests:
           - not_null
-      - name: cancel_rate_before
-        description: Cancelled / scheduled in the 24 hours before the onset. NULL with fewer than 30 departures.
-      - name: cancel_rate_during
-        description: Cancelled / scheduled from the onset to the end of precipitation. NULL with fewer than 30 departures.
-      - name: is_comparable_group
-        description: >
-          The group had 30+ departures during the precipitation in at least one storm at this
-          airport. Groups without it are too small to show for either storm.
-      - name: extra_delay_min
-        description: >
-          Median departure delay of operated flights in winter hours minus the median in hours
-          without weather phenomena, whole data window. NULL with fewer than 20 operated
-          departures in winter hours.
+          - accepted_values:
+              arguments:
+                values: ['American', 'Southwest', 'United', 'Delta', 'Spirit', 'Frontier', 'Other']
+
 
   - name: mart_airport_daily
     description: >
@@ -193,3 +178,19 @@ models:
                 values: ['local snow or ice', 'thunderstorms', 'weather elsewhere']
       - name: normal_diverted_arrivals
         description: Median diverted arrivals per day at the airport in the same year.
+  
+  - name: mart_unusual_days
+    description: >
+      One row per airport and day: daily cancellations, the main storm period, and an
+      explanation for unusual days (5 %+ cancelled outside the storm period).
+    columns:
+      - name: airport_day_id
+        data_tests: [unique, not_null]
+      - name: in_storm
+        data_tests: [not_null]
+      - name: unusual_explanation
+        description: Empty unless is_unusual.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['local snow or ice', 'local thunderstorms', 'weather elsewhere in the network']
