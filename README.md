@@ -5,9 +5,11 @@ and did airports and airlines handle **Winter Storm Fern (January 2026)** better
 **Winter Storm Uri (February 2021)**?
 
 An end-to-end analytics engineering project: Python ingestion of public flight and weather data,
-a tested dbt pipeline on DuckDB, and an analysis notebook.
+a tested dbt pipeline on DuckDB, an analysis notebook and interactive Tableau dashboards.
 
-![Cancellations around the storm onset](docs/images/cancellations_around_onset.png)
+**[Interactive dashboards on Tableau Public →](https://public.tableau.com/views/TexasWinterStormsvsFlights/UrivsFern?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)**
+
+[![Uri vs Fern dashboard](docs/images/dashboard_uri_vs_fern.png)](https://public.tableau.com/views/TexasWinterStormsvsFlights/UrivsFern?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)
 
 ## Key findings
 
@@ -48,10 +50,14 @@ Fern was much weaker than Uri at AUS, SAT and IAH, so their lower cancellation r
 reflect milder weather. At IAH Fern brought only 3 hours of winter precipitation and no
 sustained period, so no lag can be computed.
 
-<p float="left">
-  <img src="docs/images/lag_and_recovery.png" width="49%" />
-  <img src="docs/images/cancellations_by_weather.png" width="49%" />
-</p>
+During Fern, cancellations rose at the onset of sustained precipitation; during Uri, half a day later:
+
+![Cancellations around the storm onset](docs/images/cancellations_around_onset.png)
+
+Flights scheduled in freezing rain, ice pellets or snow mostly flew during Uri and were almost all
+cancelled during Fern:
+
+![Cancellations by the weather at departure](docs/images/cancellations_by_weather.png)
 
 ### DFW: comparable storms, different response
 
@@ -70,6 +76,10 @@ normal hour). This fits the airlines' new strategy rather than a better-run airf
 SAT and IAH Fern was too weak to compare; this is reported as a limitation, not as a result.
 
 ![Airport operations in winter hours](docs/images/airport_operations_in_winter_hours.png)
+
+The second dashboard puts the airline and anomaly findings for DFW on one page:
+
+[![Airlines and anomalies at DFW dashboard](docs/images/dashboard_dfw_airlines.png)](https://public.tableau.com/views/TexasWinterStormsvsFlights/UrivsFern?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)
 
 ### Anomalies
 
@@ -98,8 +108,8 @@ and SAT: 277,282 flights and 13,220 weather reports. No API keys are needed.
 
 ```
 BTS ZIP files ─┐                    ┌─ staging ── prep ── marts ─┐
-               ├─ Python ─ Parquet ─┤          dbt + DuckDB      ├─ notebook ─ charts
-IEM METAR CSV ─┘                    └────────────────────────────┘
+               ├─ Python ─ Parquet ─┤          dbt + DuckDB      ├─┬─ notebook ─ charts
+IEM METAR CSV ─┘                    └────────────────────────────┘ └─ CSV export ─ Tableau
 ```
 
 ![dbt lineage graph](docs/images/lineage_graph.png)
@@ -109,9 +119,16 @@ IEM METAR CSV ─┘                    └────────────�
 | Ingestion | `ingest/flights.py`, `ingest/weather.py` | Download, filter to the four airports, keep source column names, write Parquet. Driven by `config/project.yml` |
 | Staging | `stg_flights`, `stg_metar` | Renaming, types, decoded cancellation reasons, US units to metric, UTC to local time |
 | Prep | `prep_flights`, `prep_weather_hourly` | Local timestamps from BTS `hhmm` times; one row per airport and hour with weather parsed from METAR codes |
+| Seeds | `storm_events`, `airline_groups` | Approximate storm dates; operating carrier to brand (regional carriers grouped with the airline they fly for) |
 | Marts | `mart_flights_weather`, `mart_airport_hourly`, `mart_storm_summary` | Flights with the weather at departure; airport hours with cancellations next to weather; one row per storm and airport with timing metrics |
+| BI marts | `mart_storm_timeline`, `mart_airline_storm`, `mart_unusual_days` | Airport hours aligned on hours from the onset; cancellations and median delays per airline group; daily cancellations with an explanation for unusual days |
+| Export | `export/tableau.py` | Writes every `mart_*` table to CSV for Tableau Public, which cannot connect to DuckDB |
 
-The project has 37 dbt tests: keys, accepted values, relationships, and two singular tests that
+All metrics are defined once in dbt: the notebook and the dashboards read the same marts, and
+Tableau only displays them. Medians and thresholds (for example, rates need 30+ departures) are
+computed in the marts, not in Tableau formulas.
+
+The project has 60 dbt tests: keys, accepted values, relationships, and two singular tests that
 check counts across models (every departure lands in exactly one airport hour; cancellations by
 reason add up to the total).
 
@@ -127,6 +144,10 @@ reason add up to the total).
 6. airport operations in ice and snow (taxi-out, delays, hours with departures);
 7. airlines: who changed their strategy;
 8. anomalies: unusual days outside the storms and anomalies in the data itself.
+
+The Tableau workbook ([Tableau Public](https://public.tableau.com/views/TexasWinterStormsvsFlights/UrivsFern?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link)) has two dashboards: **Uri vs Fern**
+compares the storms at each airport, **Airlines & anomalies** covers DFW only, the one airport
+with comparable weather in both storms.
 
 ## Method
 
@@ -206,6 +227,10 @@ dbt build
 dbt docs generate && dbt docs serve   # optional: documentation and lineage graph
 
 # 3. Open analysis/storm_comparison.ipynb and run all cells
+
+# 4. Optional: export the marts to CSV for Tableau (from the project root)
+cd ..
+python -m export.tableau   # writes data/tableau/mart_*.csv
 ```
 
 To add another storm, add it to `config/project.yml` and `dbt/seeds/storm_events.csv`
@@ -216,15 +241,16 @@ and rerun the steps above.
 ```
 config/project.yml        airports, weather stations and storm windows
 ingest/                   Python ingestion scripts (BTS flights, IEM METAR)
+export/                   CSV export of the marts for Tableau
 dbt/
   models/staging/         one model per source
   models/prep/            local timestamps, hourly weather
   models/marts/           analysis-ready tables
   macros/                 METAR value parsing, hhmm time parsing
-  seeds/                  storm events
+  seeds/                  storm events, airline groups
   tests/                  singular tests
 analysis/                 analysis notebook
 docs/images/              charts and lineage graph
 ```
 
-**Stack:** Python, pandas, DuckDB, dbt Core, matplotlib.
+**Stack:** Python, pandas, DuckDB, dbt Core, matplotlib, Tableau.
